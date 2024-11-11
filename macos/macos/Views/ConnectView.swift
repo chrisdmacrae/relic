@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConnectView: View {
-    var onConnect: (String, Int, String, String, String?) -> Void
+    var onConnect: (String, Int, String, String, String?, String?) -> Void
     var onCancel: () -> Void
     
     @EnvironmentObject var appState: AppState
@@ -16,7 +16,9 @@ struct ConnectView: View {
     @State private var port: Int = 6697
     @State private var nickname: String = ""
     @State private var realname: String = ""
+    @State private var username: String = ""
     @State private var password: String = ""
+    @State private var usernameIsNickname: Bool = true
     
     var body: some View {
         VStack {
@@ -35,7 +37,7 @@ struct ConnectView: View {
                         TextField("Hostname", text: $hostname)
                             .textFieldStyle(InputStyle())
                     }
-
+                    
                     VStack(alignment: .leading) {
                         Text("Port")
                             .font(.caption)
@@ -50,6 +52,7 @@ struct ConnectView: View {
                     Text("Nickname")
                         .font(.caption)
                         .foregroundStyle(.gray)
+                    
                     TextField("Display name", text: $nickname)
                         .textFieldStyle(InputStyle())
                 }
@@ -61,7 +64,37 @@ struct ConnectView: View {
                     TextField("Real name", text: $realname)
                         .textFieldStyle(InputStyle())
                 }
-                
+                            
+                    VStack(alignment: .leading) {
+                        Text("Username")
+                            .font(.caption)
+                            .foregroundStyle(.gray)
+                        
+                        HStack(alignment: .center) {
+
+                        TextField("Username", text: $username)
+                            .textFieldStyle(InputStyle())
+                            .disabled(usernameIsNickname)
+                    
+                        Toggle(isOn: $usernameIsNickname) {
+                            Text("Same as nickname")
+                                .font(.caption)
+                                .foregroundStyle(.gray)
+                        }
+                        .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+                        .onChange(of: usernameIsNickname) { newValue in
+                            if newValue {
+                                username = nickname
+                            }
+                        }
+                        .onChange(of: nickname) { newValue in
+                            if usernameIsNickname {
+                                username = newValue
+                            }
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
                 
                 VStack(alignment: .leading) {
                     Text("Password (optional)")
@@ -73,42 +106,50 @@ struct ConnectView: View {
                 
                 Spacer()
             }
-            .frame(maxWidth: 520)
-            Divider()
-                .frame(maxWidth: .infinity)
-                .frame(height: 1)
-                .background(.gray.opacity(0.25))
-            HStack {
-                Button(action: onCancel) {
-                    Text("Cancel")
+                .frame(maxWidth: 520)
+                Divider()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 1)
+                    .background(.gray.opacity(0.25))
+                HStack {
+                    Button(action: onCancel) {
+                        Text("Cancel")
+                    }
+                    .buttonStyle(ConnectButtonStyle())
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        onConnect(hostname, port, nickname, realname, usernameIsNickname ? nickname : username, password)
+                    }) {
+                        Text("Connect")
+                    }
+                    .buttonStyle(ConnectButtonStyle())
                 }
-                .buttonStyle(ConnectButtonStyle())
-
-                Spacer()
-
-                Button(action: {
-                    onConnect(hostname, port, nickname, realname, password)
-                }) {
-                    Text("Connect")
-                }
-                .buttonStyle(ConnectButtonStyle())
+                .padding(.horizontal)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
-        }
-        .onAppear() {
-            if (appState.selectedServer != nil) {
-                let server = appState.selectedServer!
-                hostname = server.hostname
-                port = server.port
-                nickname = server.nickname
-                realname = server.realname
-                if (server.password != nil) {
-                    password = server.password!
+            .onAppear() {
+                if (appState.selectedServer != nil) {
+                    let server = appState.selectedServer!
+                    hostname = server.hostname
+                    port = server.port
+                    nickname = server.nickname
+                    realname = server.realname
+                    
+                    if server.username == "" {
+                        usernameIsNickname = true
+                        username = server.nickname
+                    } else {
+                        username = server.username!
+                    }
+                    
+                    if (server.password != nil) {
+                        password = server.password!
+                    }
                 }
             }
         }
-    }
 }
 
 struct InputStyle : TextFieldStyle {
@@ -122,5 +163,5 @@ struct InputStyle : TextFieldStyle {
 }
 
 #Preview {
-    ConnectView(onConnect: { _, _, _, _, _ in }, onCancel: { })
+    ConnectView(onConnect: { _, _, _, _, _, _  in }, onCancel: { })
 }

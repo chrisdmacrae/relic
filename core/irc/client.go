@@ -45,7 +45,7 @@ func NewClient() *Client {
 	}
 }
 
-func (c *Client) Connect(hostname string, port int, nick string, realname string, password *string) error {
+func (c *Client) Connect(hostname string, port int, nick string, realname string, username *string, password *string) error {
 	c.Server = fmt.Sprintf("%s:%d", hostname, port)
 
 	c.State.CurrentServer = models.Server{
@@ -53,13 +53,14 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 		Port:     port,
 		Nickname: nick,
 		Realname: realname,
-		Username: &nick,
+		Username: username,
 		Password: password,
 	}
 
 	c.State.CurrentUser = models.User{
 		Nick:     nick,
 		RealName: realname,
+		Username: *username,
 	}
 
 	err := config.AddServer(models.Server{
@@ -67,7 +68,7 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 		Port:     port,
 		Nickname: nick,
 		Realname: realname,
-		Username: &nick,
+		Username: username,
 		Password: password,
 	})
 	if err != nil {
@@ -80,14 +81,14 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 	}
 	c.conn = conn
 
-	if password != nil {
+	if username != nil && password != nil {
 		c.Send("CAP REQ :sasl\r\n")
 		c.Send(fmt.Sprintf("NICK %s\r\n", c.State.CurrentUser.Nick))
 		c.Send(fmt.Sprintf("USER %s\r\n", c.State.CurrentUser.UserInfo()))
 
 		// Handle SASL authentication
 		c.Send("AUTHENTICATE PLAIN\r\n")
-		authString := fmt.Sprintf("%s\x00%s\x00%s", c.State.CurrentUser.Username, c.State.CurrentUser.Username, *password)
+		authString := fmt.Sprintf("%s\x00%s\x00%s", *username, *username, *password)
 		encodedAuth := base64.StdEncoding.EncodeToString([]byte(authString))
 		c.Send(fmt.Sprintf("AUTHENTICATE %s\r\n", encodedAuth))
 		c.Send("CAP END\r\n")

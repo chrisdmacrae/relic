@@ -37,7 +37,7 @@ class AppState : ObservableObject {
         self.ircContext.bridge.setChannelDelegate(ChannelDelegate(context: self.ircContext, appState: self))
     }
     
-    func connect(host: String, port: Int, nick: String, realname: String, password: String?) {
+    func connect(host: String, port: Int, nick: String, realname: String, username: String?, password: String?) {
         status = .connecting
         
         DispatchQueue.global(qos: .background).async {
@@ -46,6 +46,7 @@ class AppState : ObservableObject {
                 port: port,
                 nick: nick,
                 realname: realname,
+                username: username,
                 password: password
             )
             

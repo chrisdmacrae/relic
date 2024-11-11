@@ -13,7 +13,7 @@ import (
 
 type IrcBridge interface {
 	Connect(server string, port int, nick string, realname string) error
-	ConnectWithAuth(server string, port int, nickname string, realname string, password string) error
+	ConnectWithAuth(server string, port int, nickname string, realname string, username string, password string) error
 	StartBackgroundHealthcheck()
 	Disconnect()
 	IsConnected() bool
@@ -32,6 +32,8 @@ type IrcBridge interface {
 }
 
 func NewBridge() IrcBridge {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+
 	return &ircBridge{
 		client: irc.NewClient(),
 	}
@@ -50,11 +52,11 @@ func (b *ircBridge) StartBackgroundHealthcheck() {
 }
 
 func (b *ircBridge) Connect(server string, port int, nick string, realname string) error {
-	return b.client.Connect(server, port, nick, realname, nil)
+	return b.client.Connect(server, port, nick, realname, nil, nil)
 }
 
-func (b *ircBridge) ConnectWithAuth(server string, port int, nick string, realname string, password string) error {
-	return b.client.Connect(server, port, nick, realname, &password)
+func (b *ircBridge) ConnectWithAuth(server string, port int, nick string, realname string, username string, password string) error {
+	return b.client.Connect(server, port, nick, realname, &username, &password)
 }
 
 func (b *ircBridge) IsConnected() bool {

@@ -64,15 +64,17 @@ class IrcContext : ObservableObject {
         port: Int,
         nick: String,
         realname: String,
+        username: String?,
         password: String?
     ) {
         do {
-            if (password != nil && password != "") {
+            if (username != nil && username != "" && password != nil && password != "") {
                 try self.bridge.connect(
                     withAuth: host,
                     port: port,
                     nickname: nick,
                     realname: realname,
+                    username: username!,
                     password: password!
                 )
             } else {

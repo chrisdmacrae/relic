@@ -11,6 +11,7 @@ import Core
 struct User: Codable {
     var nick: String
     var realName: String
+    var username: String
     var host: String
 
     // Initialize from DtosUser instance
@@ -18,6 +19,7 @@ struct User: Codable {
         self.nick = dtosUser.nick
         self.realName = dtosUser.realName
         self.host = dtosUser.host
+        self.username = dtosUser.username
     }
     
     // Convert to DtosUser instance
@@ -26,6 +28,7 @@ struct User: Codable {
         dtosUser.nick = self.nick
         dtosUser.realName = self.realName
         dtosUser.host = self.host
+        dtosUser.username = self.username
         return dtosUser
     }
 }

@@ -90,6 +90,9 @@ var channelsRegex = regexp.MustCompile(`^:\S+ 322 \S+ \S+ \d+ :`)
 func onChannels(message string, state *state.ClientState) {
 	parts := strings.SplitN(message, " ", 6)
 
+	slog.Info("irc", "channels", parts)
+	slog.Info("irc", "channels", len(parts))
+
 	if len(parts) >= 6 {
 		rawChannelsString := parts[5]
 

@@ -115,8 +115,8 @@ struct ContentView: View {
                         }
                     }
                     else if (appState.status == .promptingForConnection) {
-                        ConnectView(onConnect: { hostname, port, nickname, realname, password in
-                            appState.connect(host: hostname, port: port, nick: nickname, realname: realname, password: password)
+                        ConnectView(onConnect: { hostname, port, nickname, realname, username, password in
+                            appState.connect(host: hostname, port: port, nick: nickname, realname: realname, username: username, password: password)
                         }, onCancel: {
                             appState.status = .welcoming
                         })

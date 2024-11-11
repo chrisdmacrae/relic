@@ -7,6 +7,7 @@ type Server struct {
 	Port     int
 	Nickname string
 	Realname string
+	Username string
 	Password string
 }
 

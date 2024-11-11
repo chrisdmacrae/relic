@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -18,6 +19,8 @@ func (c *Client) Send(message string) error {
 
 		return err
 	}
+
+	slog.Debug("Sent message", "message", message)
 
 	return nil
 }

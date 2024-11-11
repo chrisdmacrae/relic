@@ -25,7 +25,7 @@ func (u *User) ToDto() dtos.User {
 	}
 }
 
-// <nickname> <hopcount> <status> :<realname>
+// <username> <hostname> <servername> <realname>
 func (u *User) UserInfo() string {
-	return fmt.Sprintf("%s %d %s :%s", u.Nick, u.Hopcount, "*", u.RealName)
+	return fmt.Sprintf("%s %d %s :%s", u.Username, u.Hopcount, "*", u.RealName)
 }

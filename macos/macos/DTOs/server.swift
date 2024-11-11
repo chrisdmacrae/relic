@@ -13,6 +13,7 @@ struct Server: Codable {
     var port: Int
     var nickname: String
     var realname: String
+    var username: String?
     var password: String?
 
     // Initialize from DtosServer instance
@@ -21,6 +22,7 @@ struct Server: Codable {
         self.port = Int(dtosServer.port)
         self.nickname = dtosServer.nickname
         self.realname = dtosServer.realname
+        self.username = dtosServer.username
         self.password = dtosServer.password
     }
     
@@ -31,6 +33,9 @@ struct Server: Codable {
         dtosServer.port = Int(self.port)
         dtosServer.nickname = self.nickname
         dtosServer.realname = self.realname
+        if (self.username != nil) {
+            dtosServer.username = self.username!
+        }
         if (self.password != nil) {
             dtosServer.password = self.password!
         }
