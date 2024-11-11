@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log/slog"
 	"regexp"
 	"strings"
 
@@ -90,9 +89,6 @@ var channelsRegex = regexp.MustCompile(`^:\S+ 322 \S+ \S+ \d+ :`)
 func onChannels(message string, state *state.ClientState) {
 	parts := strings.SplitN(message, " ", 6)
 
-	slog.Info("irc", "channels", parts)
-	slog.Info("irc", "channels", len(parts))
-
 	if len(parts) >= 6 {
 		rawChannelsString := parts[5]
 
@@ -115,8 +111,6 @@ func onChannels(message string, state *state.ClientState) {
 				}
 			}
 
-			slog.Debug("irc", "channels", currentChannels)
-
 			state.AvailableChannels = currentChannels
 		} else {
 			fmt.Printf("Server: %s\n", rawChannelsString)
@@ -126,10 +120,10 @@ func onChannels(message string, state *state.ClientState) {
 	}
 }
 
-var channelsEndRegex = regexp.MustCompile(`^:\S+ 323 \S+ :End of /LIST`)
+var channelsEndRegex = regexp.MustCompile(`^:\S+ 323 \S+ :End of (\/)?LIST`)
 
 func onChannelsEnd(message string, state *state.ClientState) {
-	irc_state.RequestAllChannelsChan <- strings.Join(state.AvailableChannels, ",")
+	irc_state.RequestAllChannelsChan <- state.AvailableChannels
 }
 
 var channelNicksRegex = regexp.MustCompile(`^:\S+ 353 \S+ = \S+ :`)

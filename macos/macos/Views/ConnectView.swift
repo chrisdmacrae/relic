@@ -120,7 +120,7 @@ struct ConnectView: View {
                     Spacer()
                     
                     Button(action: {
-                        onConnect(hostname, port, nickname, realname, usernameIsNickname ? nickname : username, password)
+                        onConnect(hostname, port, nickname, realname, username != "" ? username : nil, password != "" ? password : nil)
                     }) {
                         Text("Connect")
                     }
@@ -129,7 +129,7 @@ struct ConnectView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 8)
             }
-            .onAppear() {
+            .onAppear() {                
                 if (appState.selectedServer != nil) {
                     let server = appState.selectedServer!
                     hostname = server.hostname
@@ -140,11 +140,11 @@ struct ConnectView: View {
                     if server.username == "" {
                         usernameIsNickname = true
                         username = server.nickname
-                    } else {
+                    } else if (server.username != nil) {
                         username = server.username!
                     }
                     
-                    if (server.password != nil) {
+                    if (server.password != nil && server.password != "") {
                         password = server.password!
                     }
                 }

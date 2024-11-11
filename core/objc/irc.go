@@ -52,7 +52,7 @@ func (b *ircBridge) StartBackgroundHealthcheck() {
 }
 
 func (b *ircBridge) Connect(server string, port int, nick string, realname string) error {
-	return b.client.Connect(server, port, nick, realname, nil, nil)
+	return b.client.Connect(server, port, nick, realname, &nick, nil)
 }
 
 func (b *ircBridge) ConnectWithAuth(server string, port int, nick string, realname string, username string, password string) error {
@@ -94,6 +94,11 @@ func (b *ircBridge) GetRecentServersPayload() string {
 	if err != nil {
 		slog.Info("irc", "error", err)
 		return "[]"
+	}
+
+	// return last 10
+	if len(servers) > 10 {
+		// return string(payload[len(payload)-10:])
 	}
 
 	return string(payload)

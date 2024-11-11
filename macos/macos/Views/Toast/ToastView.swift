@@ -37,6 +37,10 @@ struct ToastView: View {
       RoundedRectangle(cornerRadius: 8)
         .fill(.thinMaterial)
         .shadow(radius: 4)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.black.opacity(0.1))
+        )
     )
     .padding(.horizontal, 16)
   }

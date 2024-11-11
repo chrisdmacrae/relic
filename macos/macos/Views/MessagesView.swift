@@ -32,7 +32,7 @@ struct MessagesView: View {
                         Spacer()
                     }
                     .padding(.horizontal)
-                    .padding(.leading, navigationSplitViewVisibility != .doubleColumn ? 32 : 8)
+                    .padding(.leading, navigationSplitViewVisibility == .detailOnly ? 32 : 8)
                     .padding(.vertical, 8)
                     
                     Divider()

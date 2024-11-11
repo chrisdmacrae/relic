@@ -131,7 +131,23 @@ struct ChannelsView: View {
                     .background(Color.gray.opacity(0.15))
                 
                 ScrollView {
-                    if (appState.isLoadingChannels) {
+                    if (appState.channels?.isEmpty ?? false) {
+                        VStack {
+                            Text("No public channels found")
+                                .font(.callout)
+                                .foregroundColor(.gray)
+                            
+                            Button(action: {
+                                appState.loadChannels()
+                            }) {
+                                Text("Not loaded yet? Try again")
+                            }
+                                .font(.caption)
+                                .buttonStyle(LinkButtonStyle())
+                        }
+                        .padding(.vertical)
+                        .padding(.horizontal)
+                    } else if (appState.isLoadingChannels) {
                         VStack {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
@@ -145,7 +161,7 @@ struct ChannelsView: View {
                             Button(action: {
                                 appState.loadChannels()
                             }) {
-                                Text("Not loaded yet? Try again")
+                                Text("Try searching again")
                             }
                                 .font(.caption)
                                 .buttonStyle(LinkButtonStyle())

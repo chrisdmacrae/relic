@@ -12,5 +12,5 @@ type ClientState struct {
 
 var ServerPongChan = make(chan bool)
 var ConnectedChan = make(chan bool)
-var RequestAllChannelsChan = make(chan string)
+var RequestAllChannelsChan = make(chan []string)
 var RequestAllUsersChan = make(chan string)

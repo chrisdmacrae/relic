@@ -26,9 +26,6 @@ struct macosApp: App {
                 .frame(maxWidth: appState.status == .connected ? .infinity : 720)
                 .frame(maxHeight: appState.status == .connected ? .infinity : 480)
                 .environmentObject(appState)
-                .onAppear() {
-                    appState.getRecentServers()
-                }
         }
         .windowResizability(appState.status == .connected ? .automatic : .contentSize)
         .windowStyle(.hiddenTitleBar)

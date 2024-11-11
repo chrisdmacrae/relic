@@ -126,6 +126,8 @@ struct ContentView: View {
                             appState.status = .promptingForConnection
                         })
                         .onAppear() {
+                            appState.getRecentServers()
+
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
                                 NSApplication.shared.centerWindow()
                             }

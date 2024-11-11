@@ -16,7 +16,7 @@ func GetServers() ([]models.Server, error) {
 	return *servers, nil
 }
 
-func AddServer(server models.Server) error {
+func AddOrUpdateServer(server models.Server) error {
 	servers, err := GetServers()
 	if errors.Is(err, config.ErrKeyNotFound) {
 		servers = []models.Server{}
@@ -29,9 +29,11 @@ func AddServer(server models.Server) error {
 	}
 
 	var existingServer *models.Server
-	for _, s := range servers {
+	var existingServerIndex int
+	for i, s := range servers {
 		if s.Hostname == server.Hostname {
 			existingServer = &s
+			existingServerIndex = i
 			break
 		}
 	}
@@ -41,6 +43,8 @@ func AddServer(server models.Server) error {
 		existingServer.Realname = server.Realname
 		existingServer.Username = server.Username
 		existingServer.Password = server.Password
+
+		servers[existingServerIndex] = *existingServer
 
 		return config.Set("servers", servers)
 	} else {

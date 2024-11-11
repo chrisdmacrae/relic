@@ -63,18 +63,6 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 		Username: *username,
 	}
 
-	err := config.AddServer(models.Server{
-		Hostname: hostname,
-		Port:     port,
-		Nickname: nick,
-		Realname: realname,
-		Username: username,
-		Password: password,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to add server to config: %w", err)
-	}
-
 	conn, err := tls.Dial("tcp", c.Server, &tls.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to connect to IRC server: %w", err)
@@ -106,6 +94,11 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 	}
 
 	c.lastPing = time.Now().Unix()
+
+	err = config.AddOrUpdateServer(c.State.CurrentServer)
+	if err != nil {
+		return fmt.Errorf("failed to add server to config: %w", err)
+	}
 
 	return nil
 }
