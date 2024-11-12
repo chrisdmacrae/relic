@@ -41,14 +41,14 @@ type IrcHandlers interface {
 // NewClient initializes a new IRC client
 func NewClient() *Client {
 	return &Client{
-		State: state.ClientState{},
+		State: state.NewClientState(),
 	}
 }
 
 func (c *Client) Connect(hostname string, port int, nick string, realname string, username *string, password *string) error {
 	c.Server = fmt.Sprintf("%s:%d", hostname, port)
 
-	c.State.CurrentServer = models.Server{
+	c.State.CurrentServer = &models.Server{
 		Hostname: hostname,
 		Port:     port,
 		Nickname: nick,
@@ -57,7 +57,7 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 		Password: password,
 	}
 
-	c.State.CurrentUser = models.User{
+	c.State.CurrentUser = &models.User{
 		Nick:     nick,
 		RealName: realname,
 		Username: *username,
@@ -87,7 +87,7 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 
 	go c.handleServerMessages()
 
-	connected := <-state.ConnectedChan
+	connected := <-c.State.Chans.ConnectedChan
 
 	if !connected {
 		return fmt.Errorf("failed to connect")
@@ -95,7 +95,7 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 
 	c.lastPing = time.Now().Unix()
 
-	err = config.AddOrUpdateServer(c.State.CurrentServer)
+	err = config.AddOrUpdateServer(*c.State.CurrentServer)
 	if err != nil {
 		return fmt.Errorf("failed to add server to config: %w", err)
 	}
@@ -104,7 +104,7 @@ func (c *Client) Connect(hostname string, port int, nick string, realname string
 }
 
 func (c *Client) IsConnected() bool {
-	didSend := testConnWithPing(c.conn)
+	didSend := c.testConnWithPing()
 
 	return c.conn != nil && time.Now().Unix()-c.lastPing <= 300 && didSend
 }
@@ -113,7 +113,7 @@ func (c *Client) IsConnected() bool {
 func (c *Client) Disconnect() {
 	if c.conn != nil {
 		c.Send("QUIT\r\n")
-		c.Send("DISCONNECT\r\n")
+		// c.Send("DISCONNECT\r\n")
 
 		go func() {
 			for c.IsConnected() {
@@ -172,7 +172,7 @@ func (c *Client) handleServerMessages() {
 
 		// Handle PONG from server
 		if strings.HasPrefix(message, "PONG") {
-			state.ServerPongChan <- true
+			c.State.Chans.ServerPongChan <- true
 			continue
 		}
 
@@ -184,16 +184,16 @@ func (c *Client) handleServerMessages() {
 	}
 }
 
-func testConnWithPing(conn net.Conn) bool {
-	if conn == nil {
+func (c *Client) testConnWithPing() bool {
+	if c.conn == nil {
 		return false
 	}
 
-	_, err := conn.Write([]byte("PING :test\r\n"))
+	_, err := c.conn.Write([]byte("PING :test\r\n"))
 	if err != nil {
 		log.Println("Error writing to server:", err)
 		return false
 	}
 
-	return <-state.ServerPongChan
+	return <-c.State.Chans.ServerPongChan
 }

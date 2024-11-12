@@ -7,7 +7,6 @@ import (
 
 	"github.com/chrisdmacrae/com.relirc.core/irc/delegates"
 	"github.com/chrisdmacrae/com.relirc.core/irc/state"
-	irc_state "github.com/chrisdmacrae/com.relirc.core/irc/state"
 )
 
 var channelConnectRegex = regexp.MustCompile(`^:\S+ JOIN #\S+`)
@@ -32,7 +31,7 @@ func onChannelConnect(message string, state *state.ClientState, channelDelegate 
 
 var channelDisconnectRegex = regexp.MustCompile(`^:\S+ PART #\S+`)
 
-func onChannelDisconnect(message string, state *state.ClientState, channelDelegate delegates.ClientChannelDelegate) {
+func onChannelDisconnect(message string, channelDelegate delegates.ClientChannelDelegate) {
 	parts := strings.SplitN(message, " ", 4)
 
 	if len(parts) >= 4 {
@@ -84,7 +83,8 @@ func onChannelKick(message string, state *state.ClientState, channelDelegate del
 	}
 }
 
-var channelsRegex = regexp.MustCompile(`^:\S+ 322 \S+ \S+ \d+ :`)
+// :<server> 322 <nick> <channel> <user count> :<channel list>
+var channelsRegex = regexp.MustCompile(`^:\S+ 322 \S+ \S+ \d+ :\S+`)
 
 func onChannels(message string, state *state.ClientState) {
 	parts := strings.SplitN(message, " ", 6)
@@ -123,7 +123,38 @@ func onChannels(message string, state *state.ClientState) {
 var channelsEndRegex = regexp.MustCompile(`^:\S+ 323 \S+ :End of (\/)?LIST`)
 
 func onChannelsEnd(message string, state *state.ClientState) {
-	irc_state.RequestAllChannelsChan <- state.AvailableChannels
+	state.Chans.RequestAllChannelsChan <- state.AvailableChannels
+}
+
+var channelTopicRegex = regexp.MustCompile(`^:\S+ 332 \S+ #\S+ :`)
+
+func onChannelTopic(message string, state *state.ClientState, channelDelegate delegates.ClientChannelDelegate) {
+	parts := strings.SplitN(message, " ", 5)
+
+	if len(parts) >= 5 {
+		channel := parts[3]
+		rawTopicString := parts[4]
+
+		if rawTopicString[0] == ':' && channel == state.CurrentChannel.Name {
+			topicString := rawTopicString[1:] // Remove the leading colon from the message
+
+			if state.CurrentChannel.Name == channel {
+				state.CurrentChannel.Topic = topicString
+			}
+
+			state.Chans.RequestChannelTopicChan <- topicString
+		} else {
+			fmt.Printf("[%s] Server: %s\n", channel, rawTopicString)
+		}
+	}
+}
+
+var noChannelTopicRegex = regexp.MustCompile(`^:\S+ 331 \S+ #\S+ :No topic is set`)
+
+func onNoChannelTopic(message string, state *state.ClientState) {
+	state.CurrentChannel.Topic = ""
+
+	state.Chans.RequestChannelTopicChan <- ""
 }
 
 var channelNicksRegex = regexp.MustCompile(`^:\S+ 353 \S+ = \S+ :`)
@@ -140,6 +171,46 @@ func onChannelNicks(message string, state *state.ClientState) {
 			nickStrings := strings.Split(nicksString, " ")
 
 			state.CurrentChannel.Nicks = nickStrings
+		} else {
+			fmt.Printf("[%s] Server: %s\n", channel, rawUsersString)
+		}
+	}
+}
+
+var channelNicksEndRegex = regexp.MustCompile(`^:\S+ 366 \S+ #\S+ :End of /NAMES list`)
+
+func onChannelNicksEnd(message string, state *state.ClientState) {
+	state.Chans.RequestChannelUsersChan <- state.CurrentChannel.Nicks
+}
+
+var onChannelUsersRegex = regexp.MustCompile(`^:\S+ 352 \S+ \S+ \S+ \S+ \S+ :`)
+
+func onChannelUsers(message string, state *state.ClientState) {
+	parts := strings.SplitN(message, " ", 8)
+
+	if len(parts) >= 8 {
+		channel := parts[4]
+		rawUsersString := parts[7]
+
+		if rawUsersString[0] == ':' && channel == state.CurrentChannel.Name {
+			usersString := rawUsersString[1:] // Remove the leading colon from the message
+			userStrings := strings.Split(usersString, " ")
+
+			for _, userString := range userStrings {
+				found := false
+				for _, nick := range state.CurrentChannel.Nicks {
+					if nick == userString {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					state.CurrentChannel.Nicks = append(state.CurrentChannel.Nicks, userString)
+				}
+			}
+
+			state.Chans.RequestChannelUsersChan <- userStrings
 		} else {
 			fmt.Printf("[%s] Server: %s\n", channel, rawUsersString)
 		}

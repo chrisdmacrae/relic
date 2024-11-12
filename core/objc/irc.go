@@ -3,12 +3,14 @@ package objc
 import (
 	"encoding/json"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/chrisdmacrae/com.relirc.core/irc"
 	"github.com/chrisdmacrae/com.relirc.core/irc/config"
 	"github.com/chrisdmacrae/com.relirc.core/irc/delegates"
-	"github.com/chrisdmacrae/com.relirc.core/irc/state"
+	"github.com/chrisdmacrae/com.relirc.core/irc/dtos"
+	"github.com/chrisdmacrae/com.relirc.core/irc/models"
 )
 
 type IrcBridge interface {
@@ -24,6 +26,8 @@ type IrcBridge interface {
 	GetRecentServersPayload() string
 	GetAvailableChannelsPayload() string
 	GetPinnedChannelsPayload() string
+	GetChannelPayload(name string) string
+	GetUserPayload(nick string) string
 
 	PinChannel(channel string) error
 	UnpinChannel(channel string) error
@@ -31,7 +35,7 @@ type IrcBridge interface {
 	SendMessage(channel string, message string)
 }
 
-func NewBridge() IrcBridge {
+func NewIrcBridge() IrcBridge {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	return &ircBridge{
@@ -98,7 +102,7 @@ func (b *ircBridge) GetRecentServersPayload() string {
 
 	// return last 10
 	if len(servers) > 10 {
-		// return string(payload[len(payload)-10:])
+		return string(payload[len(payload)-10:])
 	}
 
 	return string(payload)
@@ -108,7 +112,7 @@ func (b *ircBridge) GetAvailableChannelsPayload() string {
 	b.client.RequestAllChannels()
 
 	// wait for state from channel;
-	<-state.RequestAllChannelsChan
+	<-b.client.State.Chans.RequestAllChannelsChan
 
 	payload, err := json.Marshal(b.client.State.AvailableChannels)
 	if err != nil {
@@ -135,11 +139,90 @@ func (b *ircBridge) GetPinnedChannelsPayload() string {
 	return string(payload)
 }
 
+func (b *ircBridge) GetChannelPayload(name string) string {
+	slog.Debug("irc", "waiting for channel state", name)
+
+	b.client.RequestChannelTopic(name)
+	var topic string = ""
+	select {
+	case topic := <-b.client.State.Chans.RequestChannelTopicChan:
+		slog.Debug("irc", "got channel topic", topic)
+	case <-time.After(5 * time.Second):
+		slog.Debug("irc", "timeout waiting for channel topic")
+		break
+	}
+
+	b.client.RequestChannelUsers(name)
+	var nicks []string = []string{}
+	select {
+	case nicks = <-b.client.State.Chans.RequestChannelUsersChan:
+		slog.Debug("irc", "got channel nicks", nicks)
+	case <-time.After(5 * time.Second):
+		slog.Debug("irc", "timeout waiting for channel users")
+		break
+	}
+
+	isPinned := false
+	pinnedChannels, err := config.GetPinnedChannels(b.client.State.CurrentServer.Hostname)
+	if err != nil {
+		slog.Debug("irc", "error", err)
+	} else {
+		for _, channel := range pinnedChannels {
+			if channel == name {
+				isPinned = true
+				break
+			}
+		}
+	}
+
+	channel := dtos.Channel{
+		Name:                name,
+		Topic:               topic,
+		IsPinned:            isPinned,
+		NicksCommaDelimited: strings.Join(nicks, ","),
+	}
+
+	payload, err := json.Marshal(channel)
+	if err != nil {
+		slog.Info("irc", "error", err)
+		return "{}"
+	}
+
+	return string(payload)
+}
+
+func (b *ircBridge) GetUserPayload(nick string) string {
+	b.client.RequestUserWhois(nick)
+
+	var whois *models.User
+	for whois == nil {
+		current_nick := <-b.client.State.Chans.RequestUserWhoisChan
+
+		if current_nick == nick {
+			user := b.client.State.Users[nick]
+
+			whois = &user
+		}
+	}
+
+	payload, err := json.Marshal(whois)
+	if err != nil {
+		slog.Info("irc", "error", err)
+		return "[]"
+	}
+
+	return string(payload)
+}
+
 func (b *ircBridge) SetConnectionDelegate(delegate delegates.ClientConnectionDelegate) {
+	slog.Debug("irc", "SetConnectionDelegate", delegate)
+
 	b.client.ConnectionDelegate = delegate
 }
 
 func (b *ircBridge) SetChannelDelegate(delegate delegates.ClientChannelDelegate) {
+	slog.Debug("irc", "SetChannelDelegate", delegate)
+
 	b.client.ChannelDelegate = delegate
 }
 

@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @EnvironmentObject var appState: AppState
+    @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var serverState: ServerState
     var onConnect: () -> Void
         
     var body: some View {
@@ -36,9 +37,9 @@ struct WelcomeView: View {
                 }
                 .frame(minWidth: 420, maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 8)
-                .background(.white.opacity(0.5))
+                .background(colorScheme == .dark ? .white.opacity(0.1) : .white.opacity(0.5))
                 
-                if (appState.recentServers.count > 0) {
+                if (serverState.recentServers.count > 0) {
                     VStack(spacing: 16) {
                         HStack {
                             Text("Recent servers")
@@ -47,9 +48,9 @@ struct WelcomeView: View {
                         }
                         
                         VStack(spacing: 8) {
-                            ForEach(appState.recentServers, id: \.hostname) { server in
+                            ForEach(serverState.recentServers, id: \.hostname) { server in
                                 Button(action: {
-                                    appState.selectedServer = server
+                                    serverState.selectedServer = server
                                     onConnect()
                                 }) {
                                     HStack {
@@ -80,7 +81,7 @@ struct WelcomeView: View {
                 
                 VStack {
                     Button(action: {
-                        appState.selectedServer = nil
+                        serverState.selectedServer = nil
                         onConnect()
                     }) {
                         Text("Connect to an IRC server")

@@ -3,7 +3,10 @@ package dtos
 import "encoding/json"
 
 type Channel struct {
-	Name string
+	Name                string `json:"name"`
+	Topic               string `json:"topic"`
+	NicksCommaDelimited string `json:"nicksCommaDelimited"`
+	IsPinned            bool   `json:"isPinned"`
 }
 
 func (c *Channel) ToJson() (string, error) {

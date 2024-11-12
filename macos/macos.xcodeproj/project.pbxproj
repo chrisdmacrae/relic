@@ -8,22 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		DF36D2F32CDED55A00224D20 /* macosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF36D2F22CDED55A00224D20 /* macosApp.swift */; };
-		DF36D2F52CDED55A00224D20 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF36D2F42CDED55A00224D20 /* ContentView.swift */; };
+		DF36D2F52CDED55A00224D20 /* ServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF36D2F42CDED55A00224D20 /* ServerView.swift */; };
 		DF36D2F72CDED55B00224D20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF36D2F62CDED55B00224D20 /* Assets.xcassets */; };
 		DF36D2FA2CDED55B00224D20 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF36D2F92CDED55B00224D20 /* Preview Assets.xcassets */; };
 		DF36D3052CDED55B00224D20 /* macosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF36D3042CDED55B00224D20 /* macosTests.swift */; };
 		DF36D30F2CDED55B00224D20 /* macosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF36D30E2CDED55B00224D20 /* macosUITests.swift */; };
 		DF36D3112CDED55B00224D20 /* macosUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF36D3102CDED55B00224D20 /* macosUITestsLaunchTests.swift */; };
 		DF6643B42CE0E5A10055C21F /* ChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6643B32CE0E5A10055C21F /* ChatBubbleView.swift */; };
-		DF6E4BB92CDFD34A0082451E /* IrcContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6E4BB82CDFD34A0082451E /* IrcContext.swift */; };
+		DF6E4BB92CDFD34A0082451E /* IrcBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6E4BB82CDFD34A0082451E /* IrcBridge.swift */; };
 		DF6E4BBB2CDFEE980082451E /* core.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF6E4BBA2CDFEE980082451E /* core.xcframework */; };
 		DF6E4BBD2CE005070082451E /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6E4BBC2CE005070082451E /* ConnectView.swift */; };
-		DFB389062CE1B96F003B25AE /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB389052CE1B96F003B25AE /* AppState.swift */; };
+		DFB389062CE1B96F003B25AE /* ServerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB389052CE1B96F003B25AE /* ServerState.swift */; };
 		DFB389092CE1BC1E003B25AE /* ToastStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB389082CE1BC1E003B25AE /* ToastStyle.swift */; };
 		DFB3890B2CE1BC2B003B25AE /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB3890A2CE1BC2B003B25AE /* ToastView.swift */; };
 		DFB3890D2CE1BC45003B25AE /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB3890C2CE1BC45003B25AE /* ToastModifier.swift */; };
 		DFB3890F2CE1BC57003B25AE /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB3890E2CE1BC57003B25AE /* Toast.swift */; };
 		DFB389112CE1BC7E003B25AE /* View+toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB389102CE1BC7E003B25AE /* View+toast.swift */; };
+		DFB389132CE2A189003B25AE /* NewServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB389122CE2A189003B25AE /* NewServerView.swift */; };
 		DFC206092CE016C400746E15 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC206082CE016C400746E15 /* WelcomeView.swift */; };
 		DFC2060C2CE01B0B00746E15 /* nsWindow+centerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC2060B2CE01B0B00746E15 /* nsWindow+centerWindow.swift */; };
 		DFC2060F2CE02F6600746E15 /* server.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC2060E2CE02F6600746E15 /* server.swift */; };
@@ -32,6 +33,13 @@
 		DFC206152CE054F300746E15 /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC206142CE054F300746E15 /* MessagesView.swift */; };
 		DFC206172CE0550400746E15 /* ChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC206162CE0550400746E15 /* ChannelsView.swift */; };
 		DFC206192CE0553F00746E15 /* channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC206182CE0553F00746E15 /* channel.swift */; };
+		DFD7F2432CE2B71D000B32B2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD7F2422CE2B71D000B32B2 /* AppState.swift */; };
+		DFD7F2462CE2C7E8000B32B2 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = DFD7F2452CE2C7E8000B32B2 /* SwiftUIIntrospect */; };
+		DFD7F2482CE2D4DE000B32B2 /* GifImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD7F2472CE2D4DE000B32B2 /* GifImageView.swift */; };
+		DFD7F24A2CE2D62F000B32B2 /* YoutubeVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD7F2492CE2D62F000B32B2 /* YoutubeVideoView.swift */; };
+		DFD7F24C2CE2DF81000B32B2 /* MessagesInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD7F24B2CE2DF81000B32B2 /* MessagesInputView.swift */; };
+		DFD7F24E2CE2DFE8000B32B2 /* String+height.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD7F24D2CE2DFE8000B32B2 /* String+height.swift */; };
+		DFD7F2502CE2EFB8000B32B2 /* ChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD7F24F2CE2EFB8000B32B2 /* ChannelView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,7 +75,7 @@
 /* Begin PBXFileReference section */
 		DF36D2EF2CDED55A00224D20 /* macos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = macos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF36D2F22CDED55A00224D20 /* macosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macosApp.swift; sourceTree = "<group>"; };
-		DF36D2F42CDED55A00224D20 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		DF36D2F42CDED55A00224D20 /* ServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerView.swift; sourceTree = "<group>"; };
 		DF36D2F62CDED55B00224D20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DF36D2F92CDED55B00224D20 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DF36D2FB2CDED55B00224D20 /* macos.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macos.entitlements; sourceTree = "<group>"; };
@@ -77,15 +85,16 @@
 		DF36D30E2CDED55B00224D20 /* macosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macosUITests.swift; sourceTree = "<group>"; };
 		DF36D3102CDED55B00224D20 /* macosUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macosUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		DF6643B32CE0E5A10055C21F /* ChatBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubbleView.swift; sourceTree = "<group>"; };
-		DF6E4BB82CDFD34A0082451E /* IrcContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrcContext.swift; sourceTree = "<group>"; };
+		DF6E4BB82CDFD34A0082451E /* IrcBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrcBridge.swift; sourceTree = "<group>"; };
 		DF6E4BBA2CDFEE980082451E /* core.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = core.xcframework; path = ../core/build/macos/core.xcframework; sourceTree = "<group>"; };
 		DF6E4BBC2CE005070082451E /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
-		DFB389052CE1B96F003B25AE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		DFB389052CE1B96F003B25AE /* ServerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerState.swift; sourceTree = "<group>"; };
 		DFB389082CE1BC1E003B25AE /* ToastStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastStyle.swift; sourceTree = "<group>"; };
 		DFB3890A2CE1BC2B003B25AE /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		DFB3890C2CE1BC45003B25AE /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
 		DFB3890E2CE1BC57003B25AE /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		DFB389102CE1BC7E003B25AE /* View+toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+toast.swift"; sourceTree = "<group>"; };
+		DFB389122CE2A189003B25AE /* NewServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewServerView.swift; sourceTree = "<group>"; };
 		DFC206082CE016C400746E15 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		DFC2060B2CE01B0B00746E15 /* nsWindow+centerWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "nsWindow+centerWindow.swift"; sourceTree = "<group>"; };
 		DFC2060E2CE02F6600746E15 /* server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = server.swift; sourceTree = "<group>"; };
@@ -94,6 +103,12 @@
 		DFC206142CE054F300746E15 /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
 		DFC206162CE0550400746E15 /* ChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsView.swift; sourceTree = "<group>"; };
 		DFC206182CE0553F00746E15 /* channel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = channel.swift; sourceTree = "<group>"; };
+		DFD7F2422CE2B71D000B32B2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		DFD7F2472CE2D4DE000B32B2 /* GifImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifImageView.swift; sourceTree = "<group>"; };
+		DFD7F2492CE2D62F000B32B2 /* YoutubeVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeVideoView.swift; sourceTree = "<group>"; };
+		DFD7F24B2CE2DF81000B32B2 /* MessagesInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesInputView.swift; sourceTree = "<group>"; };
+		DFD7F24D2CE2DFE8000B32B2 /* String+height.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+height.swift"; sourceTree = "<group>"; };
+		DFD7F24F2CE2EFB8000B32B2 /* ChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelView.swift; sourceTree = "<group>"; };
 		DFDA22362CDEDB1100FF6D78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DF6E4BBB2CDFEE980082451E /* core.xcframework in Frameworks */,
+				DFD7F2462CE2C7E8000B32B2 /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,7 +166,7 @@
 			children = (
 				DFC2060D2CE02F5C00746E15 /* DTOs */,
 				DFC2060A2CE01AFD00746E15 /* Extensions */,
-				DF6E4BB72CDFD3420082451E /* Contexts */,
+				DF6E4BB72CDFD3420082451E /* ViewModels */,
 				DF6E4BB02CDFA3A80082451E /* Views */,
 				DF36D2F22CDED55A00224D20 /* macosApp.swift */,
 				DFDA22362CDEDB1100FF6D78 /* Info.plist */,
@@ -190,23 +206,29 @@
 			isa = PBXGroup;
 			children = (
 				DFB389072CE1BC02003B25AE /* Toast */,
-				DF36D2F42CDED55A00224D20 /* ContentView.swift */,
+				DF36D2F42CDED55A00224D20 /* ServerView.swift */,
 				DF6E4BBC2CE005070082451E /* ConnectView.swift */,
 				DFC206082CE016C400746E15 /* WelcomeView.swift */,
 				DFC206142CE054F300746E15 /* MessagesView.swift */,
 				DFC206162CE0550400746E15 /* ChannelsView.swift */,
 				DF6643B32CE0E5A10055C21F /* ChatBubbleView.swift */,
+				DFB389122CE2A189003B25AE /* NewServerView.swift */,
+				DFD7F2472CE2D4DE000B32B2 /* GifImageView.swift */,
+				DFD7F2492CE2D62F000B32B2 /* YoutubeVideoView.swift */,
+				DFD7F24B2CE2DF81000B32B2 /* MessagesInputView.swift */,
+				DFD7F24F2CE2EFB8000B32B2 /* ChannelView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		DF6E4BB72CDFD3420082451E /* Contexts */ = {
+		DF6E4BB72CDFD3420082451E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				DF6E4BB82CDFD34A0082451E /* IrcContext.swift */,
-				DFB389052CE1B96F003B25AE /* AppState.swift */,
+				DF6E4BB82CDFD34A0082451E /* IrcBridge.swift */,
+				DFB389052CE1B96F003B25AE /* ServerState.swift */,
+				DFD7F2422CE2B71D000B32B2 /* AppState.swift */,
 			);
-			path = Contexts;
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		DFB389072CE1BC02003B25AE /* Toast */ = {
@@ -225,6 +247,7 @@
 			isa = PBXGroup;
 			children = (
 				DFC2060B2CE01B0B00746E15 /* nsWindow+centerWindow.swift */,
+				DFD7F24D2CE2DFE8000B32B2 /* String+height.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -257,6 +280,7 @@
 			);
 			name = macos;
 			packageProductDependencies = (
+				DFD7F2452CE2C7E8000B32B2 /* SwiftUIIntrospect */,
 			);
 			productName = macos;
 			productReference = DF36D2EF2CDED55A00224D20 /* macos.app */;
@@ -331,6 +355,7 @@
 			);
 			mainGroup = DF36D2E62CDED55A00224D20;
 			packageReferences = (
+				DFD7F2442CE2C7E8000B32B2 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 			);
 			productRefGroup = DF36D2F02CDED55A00224D20 /* Products */;
 			projectDirPath = "";
@@ -376,22 +401,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFC206092CE016C400746E15 /* WelcomeView.swift in Sources */,
+				DFB389132CE2A189003B25AE /* NewServerView.swift in Sources */,
 				DFC2060F2CE02F6600746E15 /* server.swift in Sources */,
 				DFB3890F2CE1BC57003B25AE /* Toast.swift in Sources */,
 				DFC206152CE054F300746E15 /* MessagesView.swift in Sources */,
-				DF36D2F52CDED55A00224D20 /* ContentView.swift in Sources */,
+				DF36D2F52CDED55A00224D20 /* ServerView.swift in Sources */,
 				DFB3890B2CE1BC2B003B25AE /* ToastView.swift in Sources */,
 				DFC206192CE0553F00746E15 /* channel.swift in Sources */,
+				DFD7F24C2CE2DF81000B32B2 /* MessagesInputView.swift in Sources */,
 				DFB389092CE1BC1E003B25AE /* ToastStyle.swift in Sources */,
-				DF6E4BB92CDFD34A0082451E /* IrcContext.swift in Sources */,
+				DF6E4BB92CDFD34A0082451E /* IrcBridge.swift in Sources */,
 				DFB3890D2CE1BC45003B25AE /* ToastModifier.swift in Sources */,
+				DFD7F2432CE2B71D000B32B2 /* AppState.swift in Sources */,
 				DF6643B42CE0E5A10055C21F /* ChatBubbleView.swift in Sources */,
 				DFC206112CE0300700746E15 /* user.swift in Sources */,
+				DFD7F24A2CE2D62F000B32B2 /* YoutubeVideoView.swift in Sources */,
 				DFB389112CE1BC7E003B25AE /* View+toast.swift in Sources */,
+				DFD7F24E2CE2DFE8000B32B2 /* String+height.swift in Sources */,
 				DFC2060C2CE01B0B00746E15 /* nsWindow+centerWindow.swift in Sources */,
 				DF6E4BBD2CE005070082451E /* ConnectView.swift in Sources */,
-				DFB389062CE1B96F003B25AE /* AppState.swift in Sources */,
+				DFB389062CE1B96F003B25AE /* ServerState.swift in Sources */,
+				DFD7F2482CE2D4DE000B32B2 /* GifImageView.swift in Sources */,
 				DFC206172CE0550400746E15 /* ChannelsView.swift in Sources */,
+				DFD7F2502CE2EFB8000B32B2 /* ChannelView.swift in Sources */,
 				DF36D2F32CDED55A00224D20 /* macosApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -717,6 +749,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DFD7F2442CE2C7E8000B32B2 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DFD7F2452CE2C7E8000B32B2 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFD7F2442CE2C7E8000B32B2 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = SwiftUIIntrospect;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DF36D2E72CDED55A00224D20 /* Project object */;
 }

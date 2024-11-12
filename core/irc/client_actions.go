@@ -27,7 +27,7 @@ func (c *Client) Send(message string) error {
 
 func (c *Client) JoinChannel(channel string) error {
 	c.Channel = channel
-	c.State.CurrentChannel = models.Channel{
+	c.State.CurrentChannel = &models.Channel{
 		Name: channel,
 	}
 
@@ -35,11 +35,27 @@ func (c *Client) JoinChannel(channel string) error {
 }
 
 func (c *Client) SendMessage(channel string, message string) {
-	c.Send(fmt.Sprintf("PRIVMSG %s :%s\r\n", channel, message))
+	if channel == "" || message[0] == '/' {
+		c.Send(message)
+	} else {
+		c.Send(fmt.Sprintf("PRIVMSG %s :%s\r\n", channel, message))
+	}
 }
 
 func (c *Client) RequestAllChannels() {
 	c.Send("LIST\r\n")
+}
+
+func (c *Client) RequestChannelTopic(channel string) {
+	c.Send(fmt.Sprintf("TOPIC %s\r\n", channel))
+}
+
+func (c *Client) RequestChannelUsers(channel string) {
+	c.Send(fmt.Sprintf("NAMES %s\r\n", channel))
+}
+
+func (c *Client) RequestUserWhois(nickname string) {
+	c.Send(fmt.Sprintf("WHOIS %s\r\n", nickname))
 }
 
 func (c *Client) ReadUserInput() {

@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Message struct {
 	Channel   string
 	Nick      string
@@ -12,6 +14,6 @@ func NewMessage(channel, nick, text string) *Message {
 		Channel:   channel,
 		Nick:      nick,
 		Text:      text,
-		Timestamp: 0,
+		Timestamp: time.Now().Unix(),
 	}
 }

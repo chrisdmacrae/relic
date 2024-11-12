@@ -8,8 +8,8 @@
 import Foundation
 import Core
 
-class IrcContext : ObservableObject {
-    var bridge: Core.ObjcIrcBridgeProtocol = Core.ObjcNewBridge()!
+class IrcBridge : ObservableObject {
+    var bridge: Core.ObjcIrcBridgeProtocol = Core.ObjcNewIrcBridge()!
     
     func getRecentServers() -> [Server] {
         let payload = bridge.getRecentServersPayload()
@@ -57,6 +57,22 @@ class IrcContext : ObservableObject {
         }
         
         return []
+    }
+    
+    func getChannel(channel: String) -> Channel? {
+        let payload = bridge.getChannelPayload(channel)
+        
+        if let data = payload.data(using: .utf8) {
+            do {
+                let channel = try JSONDecoder().decode(Channel.self, from: data)
+            
+                return channel
+            } catch {
+                print("Error parsing channel: \(error), \(payload)")
+            }
+        }
+        
+        return nil
     }
     
     func connect(

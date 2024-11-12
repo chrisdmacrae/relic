@@ -13,14 +13,14 @@ struct ChatBubbleView: View {
     let isCurrentUser: Bool
     
     var body: some View {
-        VStack(alignment: isCurrentUser ? .trailing : .leading, spacing: 8) {
+        VStack(alignment: isCurrentUser ? .trailing : .leading, spacing: 0) {
             // Message bubble with tail
             HStack {
                 if isCurrentUser {
                     Spacer()
                 }
                 
-                Text(message.text)
+                Text(message.text.replacingOccurrences(of: "\\n", with: "\n"))
                     .padding()
                     .background(
                         ChatBubbleShape(isCurrentUser: isCurrentUser)
@@ -35,7 +35,7 @@ struct ChatBubbleView: View {
                 }
             }
             
-            VStack(spacing: 2) {
+            VStack(alignment: isCurrentUser ? .trailing : .leading, spacing: 2) {
                 if isCurrentUser {
                     Spacer()
                 }
@@ -45,21 +45,80 @@ struct ChatBubbleView: View {
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundColor(.gray)
-                    .padding(isCurrentUser ? .leading : .trailing, 0)
                 
                 // Timestamp at the bottom
                 Text(Date(timeIntervalSince1970: TimeInterval(message.timestamp) / 1000), format: .dateTime)
                     .font(.caption2)
                     .foregroundColor(.gray)
-                    .padding(isCurrentUser ? .leading : .trailing, 24)
                 
                 if !isCurrentUser {
                     Spacer()
                 }
             }
-            .frame(minHeight: 0)
+            
+            HStack(spacing: 8) {
+                ForEach(extractImageURLs(from: message.text), id: \.self) { url in
+                    if (url.path().hasSuffix(".gif")) {
+                        GifImageView(url: url)
+                            .cornerRadius(10)
+                            .frame(maxWidth: 200) // Adjust the max width as needed
+                            .aspectRatio(contentMode: .fit)
+                    } else {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(maxWidth: 200) // Adjust the max width as needed
+                                    .cornerRadius(10)
+                            case .failure:
+                                Text("Failed to load image")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    }
+                }
+                
+                ForEach(extactYoutubeURLs(from: message.text), id: \.self) { url in
+                    YoutubeVideoView(videoUrl: url.absoluteString)
+                        .cornerRadius(10)
+                        .frame(width: 480, height: 480 * 9 / 16) // Set width to 480 and calculate height for 16:9 ratio
+                        .clipped()
+                        .aspectRatio(16/9, contentMode: .fit)
+                }
+            }
+            .padding(.top, 8)
+            .frame(alignment: isCurrentUser ? .topTrailing : .topLeading)
         }
         .padding(isCurrentUser ? .trailing : .leading, 10)
+        .frame(minHeight: 0)
+    }
+    
+    // Extract URLs with image extensions
+    func extractImageURLs(from text: String) -> [URL] {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count)) ?? []
+        return matches.compactMap { match in
+            guard let url = match.url else { return nil }
+            let pathExtension = url.pathExtension.lowercased()
+            return ["jpg", "jpeg", "png", "gif"].contains(pathExtension) ? url : nil
+        }
+    }
+    
+    func extactYoutubeURLs(from text: String) -> [URL] {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count)) ?? []
+        return matches.compactMap { match in
+            guard let url = match.url else { return nil }
+            let host = url.host?.lowercased()
+            return host?.contains("youtube.com") == true ? url : nil
+        }
     }
 }
 

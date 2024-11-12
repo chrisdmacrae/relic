@@ -11,7 +11,7 @@ struct ConnectView: View {
     var onConnect: (String, Int, String, String, String?, String?) -> Void
     var onCancel: () -> Void
     
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var serverState: ServerState
     @State private var hostname: String = "irc."
     @State private var port: Int = 6697
     @State private var nickname: String = ""
@@ -130,8 +130,8 @@ struct ConnectView: View {
                 .padding(.bottom, 8)
             }
             .onAppear() {                
-                if (appState.selectedServer != nil) {
-                    let server = appState.selectedServer!
+                if (serverState.selectedServer != nil) {
+                    let server = serverState.selectedServer!
                     hostname = server.hostname
                     port = server.port
                     nickname = server.nickname

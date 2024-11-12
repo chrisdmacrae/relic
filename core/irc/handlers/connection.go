@@ -9,8 +9,8 @@ import (
 
 var connectedRegex = regexp.MustCompile(`^:(.*) 001 (.*) (.*)$`)
 
-func onConnectedMessage(message string, connectionDelegate delegates.ClientConnectionDelegate) {
-	state.ConnectedChan <- true
+func onConnectedMessage(_ string, connectionDelegate delegates.ClientConnectionDelegate, state *state.ClientState) {
+	state.Chans.ConnectedChan <- true
 
 	if connectionDelegate != nil {
 		connectionDelegate.OnConnected()

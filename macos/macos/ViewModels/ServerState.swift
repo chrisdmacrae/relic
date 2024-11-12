@@ -8,8 +8,8 @@
 import Foundation
 import Core
 
-class AppState : ObservableObject {
-    @Published var status: Status = .welcoming
+class ServerState : ObservableObject {
+    @Published var status: Status = .disconnected
     @Published var messages = [Core.ModelsMessage]()
     @Published var notice: String?
     
@@ -23,25 +23,23 @@ class AppState : ObservableObject {
     @Published var selectedChannel: String?
     
     enum Status {
-        case welcoming
-        case promptingForConnection
+        case disconnected
         case connecting
         case connected
     }
     
-    private var ircContext: IrcContext
+    private var ircBridge = IrcBridge()
     
-    init(ircContext: IrcContext) {
-        self.ircContext = ircContext
-        self.ircContext.bridge.setConnectionDelegate(ConnectionDelegate(context: self.ircContext, appState: self))
-        self.ircContext.bridge.setChannelDelegate(ChannelDelegate(context: self.ircContext, appState: self))
+    init() {
+        self.ircBridge.bridge.setConnectionDelegate(ConnectionDelegate(context: self.ircBridge, serverState: self))
+        self.ircBridge.bridge.setChannelDelegate(ChannelDelegate(context: self.ircBridge, serverState: self))
     }
     
     func connect(host: String, port: Int, nick: String, realname: String, username: String?, password: String?) {
         status = .connecting
         
         DispatchQueue.global(qos: .background).async {
-            self.ircContext.connect(
+            self.ircBridge.connect(
                 host: host,
                 port: port,
                 nick: nick,
@@ -50,25 +48,25 @@ class AppState : ObservableObject {
                 password: password
             )
             
-            self.ircContext.bridge.startBackgroundHealthcheck()
+            self.ircBridge.bridge.startBackgroundHealthcheck()
         }
     }
     
     func disconnect() {
-        ircContext.disconnect()
+        ircBridge.disconnect()
         
-        status = .welcoming
+        self.status = .disconnected
     }
     
     func getRecentServers() {
-        recentServers = ircContext.getRecentServers()
+        recentServers = ircBridge.getRecentServers()
     }
     
     func loadChannels() {
         isLoadingChannels = true
         
         DispatchQueue.global(qos: .background).async {
-            let pinnedChannels = self.ircContext.getPinnedChannels()
+            let pinnedChannels = self.ircBridge.getPinnedChannels()
             
             DispatchQueue.main.async {
                 self.pinnedChannels = pinnedChannels.sorted()
@@ -76,7 +74,7 @@ class AppState : ObservableObject {
         }
         
         DispatchQueue.global(qos: .background).async {
-            let channels = self.ircContext.getAvailableChannels()
+            let channels = self.ircBridge.getAvailableChannels()
             
             DispatchQueue.main.async {
                 self.channels = channels.sorted()
@@ -92,51 +90,62 @@ class AppState : ObservableObject {
         }
         
         selectedChannel = mutableChannel
+        
+        ircBridge.joinChannel(selectedChannel!)
     }
     
+    func getChannel(channel: String) -> Channel? {
+        return ircBridge.getChannel(channel: channel)
+    }
     
     func pinChannel(channel: String) {
-        ircContext.pinChannel(channel: channel)
+        ircBridge.pinChannel(channel: channel)
         
-        pinnedChannels = ircContext.getPinnedChannels()
+        pinnedChannels = ircBridge.getPinnedChannels()
     }
     
     func unpinChannel(channel: String) {
-        ircContext.unpinChannel(channel: channel)
+        ircBridge.unpinChannel(channel: channel)
         
-        pinnedChannels = ircContext.getPinnedChannels()
+        pinnedChannels = ircBridge.getPinnedChannels()
     }
     
     func sendMessage(_ channel: String, message: String) {
-        ircContext.bridge.sendMessage(channel, message: message)
+        ircBridge.bridge.sendMessage(channel, message: message)
+        
+        messages.append(Core.ModelsMessage(channel, nick: selectedServer!.nickname, text: message)!)
     }
     
     // MARK: ConnectionDelegate
     
     class ConnectionDelegate : NSObject, Core.DelegatesClientConnectionDelegateProtocol {
-        private var context: IrcContext
-        private var appState: AppState
+        private var context: IrcBridge
+        private var serverState: ServerState
         
-        init(context: IrcContext, appState: AppState) {
+        init(context: IrcBridge, serverState: ServerState) {
             self.context = context
-            self.appState = appState
+            self.serverState = serverState
         }
         
         func onConnected() {
             print("Connected")
             
-            self.appState.status = .connected
+            DispatchQueue.main.async {
+                self.serverState.status = .connected
+            }
         }
         
         func onDisconnected() {
             print("Disconnected")
             
-            self.appState.status = .welcoming
+            DispatchQueue.main.async {
+                self.serverState.status = .disconnected
+            }
         }
         
         func onNotice(_ notice: String?) {
             DispatchQueue.main.async {
-                self.appState.notice = notice
+                self.serverState.notice = notice
             }
         }
     }
@@ -144,12 +153,12 @@ class AppState : ObservableObject {
     // MARK: ChannelDelegate
     
     class ChannelDelegate : NSObject, Core.DelegatesClientChannelDelegateProtocol {
-        private var context: IrcContext
-        private var appState: AppState
+        private var context: IrcBridge
+        private var serverState: ServerState
         
-        init(context: IrcContext, appState: AppState) {
+        init(context: IrcBridge, serverState: ServerState) {
             self.context = context
-            self.appState = appState
+            self.serverState = serverState
         }
         
         func onConnected(_ channel: String?) {
@@ -162,7 +171,7 @@ class AppState : ObservableObject {
         
         func onMessageReceived(_ channel: String?, nick: String?, text: String?) {
             DispatchQueue.main.async {
-                self.appState.messages.append(Core.ModelsMessage(channel, nick: nick, text: text)!)
+                self.serverState.messages.append(Core.ModelsMessage(channel, nick: nick, text: text)!)
             }
         }
     }

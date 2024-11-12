@@ -12,6 +12,7 @@ type User struct {
 	Username string           `json:"username"`
 	RealName string           `json:"realname"`
 	Status   enums.UserStatus `json:"status"`
+	Channels []string         `json:"channels"`
 	Host     string           `json:"host"`
 	Hopcount int              `json:"-"`
 }
@@ -23,6 +24,11 @@ func (u *User) ToDto() dtos.User {
 		Host:     u.Host,
 		Status:   u.Status,
 	}
+}
+
+type UserWhois struct {
+	User
+	Channels []string `json:"channels"`
 }
 
 // <username> <hostname> <servername> <realname>

@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct ChannelsView: View {
-    @EnvironmentObject var ircContext: IrcContext
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var serverState: ServerState
     @State private var filter = ""
     @State private var filteredChannels = [String]()
     @State private var showManualChannel = false
@@ -28,18 +27,18 @@ struct ChannelsView: View {
                 }
                 .padding(.horizontal)
                 
-                if appState.pinnedChannels.count > 0 {
+                if serverState.pinnedChannels.count > 0 {
                     ScrollView {
                         VStack(spacing: 8) {
-                            ForEach(appState.pinnedChannels, id: \.self) { channel in
+                            ForEach(serverState.pinnedChannels, id: \.self) { channel in
                                 Button(action: {
-                                    appState.selectedChannel = channel
+                                    serverState.joinChannel(channel: channel)
                                 }) {
                                     HStack {
                                         Text(channel)
                                         Spacer()
                                         Button(action: {
-                                            appState.unpinChannel(channel: channel)
+                                            serverState.unpinChannel(channel: channel)
                                         }) {
                                             Text("-")
                                         }
@@ -57,9 +56,15 @@ struct ChannelsView: View {
                                             pinnedChannelsSize = geo.size
                                         }
                                     }
+                                    .onChange(of: serverState.pinnedChannels) {
+                                        DispatchQueue.main.async {
+                                            pinnedChannelsSize = geo.size
+                                        }
+                                    }
                             }                        )
                     }
-                    .frame(minHeight: 0, maxHeight: pinnedChannelsSize.height) // Ensures the first ScrollView takes only the required space
+                    .frame(height: pinnedChannelsSize.height)
+                    .frame(minHeight: 0, maxHeight: pinnedChannelsSize.height)
                 } else {
                     VStack(spacing: 4) {
                         Text("No pinned channels")
@@ -94,13 +99,13 @@ struct ChannelsView: View {
                                 TextField("Channel", text: $manualChannel)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .onKeyPress(.return, action: {
-                                        appState.joinChannel(channel: manualChannel)
+                                        serverState.joinChannel(channel: manualChannel)
                                         showManualChannel.toggle()
                                         
                                         return .handled
                                     })
                                 Button("Join") {
-                                    appState.joinChannel(channel: manualChannel)
+                                    serverState.joinChannel(channel: manualChannel)
                                     showManualChannel.toggle()
                                 }
                             }
@@ -111,14 +116,14 @@ struct ChannelsView: View {
                     
                     TextField("Filter", text: $filter)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .onChange(of: appState.channels) {
-                            filteredChannels = appState.channels ?? []
+                        .onChange(of: serverState.channels) {
+                            filteredChannels = serverState.channels ?? []
                         }
                         .onChange(of: filter) { value in
                             if value.isEmpty {
-                                filteredChannels = appState.channels ?? []
-                            } else if (appState.channels != nil) {
-                                filteredChannels = appState.channels!.filter { $0.contains(value) }
+                                filteredChannels = serverState.channels ?? []
+                            } else if (serverState.channels != nil) {
+                                filteredChannels = serverState.channels!.filter { $0.contains(value) }
                             }
                         }
                 }
@@ -131,14 +136,14 @@ struct ChannelsView: View {
                     .background(Color.gray.opacity(0.15))
                 
                 ScrollView {
-                    if (appState.channels?.isEmpty ?? false) {
+                    if (serverState.channels?.isEmpty ?? false) {
                         VStack {
                             Text("No public channels found")
                                 .font(.callout)
                                 .foregroundColor(.gray)
                             
                             Button(action: {
-                                appState.loadChannels()
+                                serverState.loadChannels()
                             }) {
                                 Text("Not loaded yet? Try again")
                             }
@@ -147,7 +152,7 @@ struct ChannelsView: View {
                         }
                         .padding(.vertical)
                         .padding(.horizontal)
-                    } else if (appState.isLoadingChannels) {
+                    } else if (serverState.isLoadingChannels) {
                         VStack {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
@@ -159,7 +164,7 @@ struct ChannelsView: View {
                                 .foregroundColor(.gray)
                             
                             Button(action: {
-                                appState.loadChannels()
+                                serverState.loadChannels()
                             }) {
                                 Text("Try searching again")
                             }
@@ -173,13 +178,13 @@ struct ChannelsView: View {
                         LazyVStack(spacing: 8) {
                             ForEach(filteredChannels, id: \.self) { channel in
                                 Button(action: {
-                                    appState.selectedChannel = channel
+                                    serverState.joinChannel(channel: channel)
                                 }) {
                                     HStack {
                                         Text(channel)
                                         Spacer()
                                         Button(action: {
-                                            appState.pinChannel(channel: channel)
+                                            serverState.pinChannel(channel: channel)
                                         }) {
                                             Text("+")
                                         }

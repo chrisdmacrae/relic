@@ -8,66 +8,115 @@
 import SwiftUI
 
 struct MessagesView: View {
-    @EnvironmentObject private var ircContext: IrcContext
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var serverState: ServerState
     @State private var message = ""
-    
-    @Binding var navigationSplitViewVisibility: NavigationSplitViewVisibility
-    
-    init(navigationSplitViewVisibility: Binding<NavigationSplitViewVisibility>) {
-        _navigationSplitViewVisibility = navigationSplitViewVisibility
-    }
+    @State private var hasNewMessages = false
     
     var body: some View {
         VStack {
-            if (appState.isLoadingSelectedChannel) {
+            if (serverState.isLoadingSelectedChannel) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
-            } else if (appState.selectedChannel != nil) {
+            } else if (serverState.selectedChannel != nil) {
                 VStack(spacing: 0) {
-                    HStack {
-                        Text("\(appState.selectedChannel!)")
-                            .fontWeight(.bold)
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-                    .padding(.leading, navigationSplitViewVisibility == .detailOnly ? 32 : 8)
-                    .padding(.vertical, 8)
-                    
                     Divider()
                         .frame(maxWidth: .infinity)
                         .frame(height: 1)
                         .background(.gray.opacity(0.25))
                     
-                    Spacer()
-                    
-                    VStack {
-                        ForEach(appState.messages, id: \.self) { message in
-                            ChatBubbleView(message: message, isCurrentUser: message.nick == appState.selectedServer?.nickname)
-                        }
-                    }
-                    .padding(.bottom, 8)
+                    ZStack {
+                        GeometryReader { scrollViewGeo in
+                            ScrollViewReader { proxy in
+                                ZStack {
+                                    ScrollView {
+                                        LazyVStack(spacing: 16) {
+                                            ForEach(serverState.messages, id: \.self) { message in
+                                                ChatBubbleView(message: message, isCurrentUser: message.nick == serverState.selectedServer?.nickname)
+                                            }
+                                        }
+                                        .padding(.top, 16)
+                                        .padding(.bottom, 120)
                                         
-                    Divider()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 1)
-                        .background(.gray.opacity(0.25))
-                    HStack {
-                        TextField("Message", text: $message)
-                            .textFieldStyle(.roundedBorder)
-                            .onSubmit {
-                                sendMessage()
+                                        VStack{}
+                                            .id(-1)
+                                            .background(
+                                                GeometryReader { geo in
+                                                    Color.clear                                                    .onChange(of: serverState.messages) { _ in
+                                                        let visible = checkIfVisible(geo: geo, scrollViewGeo: scrollViewGeo, id: -1)
+                                                        
+                                                        hasNewMessages = !visible
+                                                    }
+                                                }
+                                            )
+                                    }
+                                    .onReceive(serverState.$messages) { messages in
+                                        if let lastMessage = messages.last {
+                                            if lastMessage.nick == serverState.selectedServer?.nickname {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                    proxy.scrollTo(-1, anchor: .bottom)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    VStack {
+                                        if hasNewMessages {
+                                            HStack {
+                                                Button("New messages. View now") {
+                                                    withAnimation {
+                                                        proxy.scrollTo(-1, anchor: .bottom)
+                                                    }
+                                                    
+                                                    hasNewMessages = false
+                                                }
+                                                .buttonStyle(LinkButtonStyle())
+                                                .padding()
+                                            }
+                                            .background(.thinMaterial)
+                                            .shadow(radius: 4)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        }
+                                    }
+                                    .frame(maxHeight: .infinity, alignment: .bottom)
+                                    .ignoresSafeArea(.container)
+                                    .padding(.bottom, 120)
+                                }
                             }
-                        Button("Send") {
-                            sendMessage()
                         }
-                        .keyboardShortcut(.return)
+                        
+                        VStack {
+                            Spacer()
+                            
+                            VStack {
+                                Divider()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 1)
+                                    .background(.gray.opacity(0.01))
+                                MessagesInputView(text: $message, onSubmit: sendMessage)
+                            }
+                            .ignoresSafeArea(.container)
+                            .background(.thinMaterial)
+                        }
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .ignoresSafeArea(.container)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
                 }
-                .ignoresSafeArea(.container)
+                .toolbar {
+                    ToolbarItemGroup {
+                        HStack {
+                            Text("\(serverState.selectedChannel!)")
+                                .fontWeight(.bold)
+                            Button(action: {
+                                serverState.pinChannel(channel: serverState.selectedChannel!)
+                            }) {
+                                Text("+")
+                            }
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
             } else {
                 Text("Select a channel")
                     .font(.title)
@@ -76,17 +125,24 @@ struct MessagesView: View {
         }
     }
     
-    func sendMessage() {
-        if (appState.selectedChannel == nil) {
+    private func sendMessage() {
+        if (serverState.selectedChannel == nil) {
             return
         }
         
-        appState.sendMessage(appState.selectedChannel!, message: message)
+        serverState.sendMessage(serverState.selectedChannel!, message: message.replacingOccurrences(of: "\n", with: "\\n"))
         
         message = ""
     }
+    
+    private func checkIfVisible(geo: GeometryProxy, scrollViewGeo: GeometryProxy, id: AnyHashable) -> Bool {
+            let viewFrame = geo.frame(in: .global)
+            let scrollViewFrame = scrollViewGeo.frame(in: .global)
+            
+            return scrollViewFrame.intersects(viewFrame)
+        }
 }
 
 #Preview {
-    MessagesView(navigationSplitViewVisibility: .constant(.automatic))
+    MessagesView()
 }

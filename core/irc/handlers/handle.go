@@ -19,13 +19,17 @@ func HandleMessage(message string, deps HandleMessageDependencies) {
 
 	switch {
 	case connectedRegex.MatchString(message):
-		onConnectedMessage(message, deps.ConnectionDelegate)
+		onConnectedMessage(message, deps.ConnectionDelegate, deps.State)
 	case noticeRegex.MatchString(message):
 		onNoticeMessage(message, deps.ConnectionDelegate)
 	case privMsgRegex.MatchString(message):
 		onPrivMsg(message, deps.ChannelDelegate)
+	case onChannelUsersRegex.MatchString(message):
+		onChannelUsers(message, deps.State)
 	case channelNicksRegex.MatchString(message):
 		onChannelNicks(message, deps.State)
+	case channelNicksEndRegex.MatchString(message):
+		onChannelNicksEnd(message, deps.State)
 	case channelsRegex.MatchString(message):
 		onChannels(message, deps.State)
 	case channelsEndRegex.MatchString(message):
@@ -33,13 +37,19 @@ func HandleMessage(message string, deps HandleMessageDependencies) {
 	case channelConnectRegex.MatchString(message):
 		onChannelConnect(message, deps.State, deps.ChannelDelegate)
 	case channelDisconnectRegex.MatchString(message):
-		onChannelDisconnect(message, deps.State, deps.ChannelDelegate)
+		onChannelDisconnect(message, deps.ChannelDelegate)
 	case channelQuitRegex.MatchString(message):
 		onChannelQuit(message, deps.State, deps.ChannelDelegate)
 	case userHostRegex.MatchString(message):
 		onUserHost(message, deps.State)
-	case whoisRegex.MatchString(message):
-		onWhois(message, deps.State)
+	case whoisBasicRegex.MatchString(message):
+		onWhoisBasicInfo(message, deps.State)
+	case whoisChannelsRegex.MatchString(message):
+		onWhoisChannels(message, deps.State)
+	case whoisRealNameRegex.MatchString(message):
+		onWhoisRealName(message, deps.State)
+	case whoisEndRegex.MatchString(message):
+		onWhoisEnd(message, deps.State)
 	default:
 		return
 	}
